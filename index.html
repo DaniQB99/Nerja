@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Viaje a Nerja</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <h1>Viaje a Nerja ☀️</h1>
+            <p>Guía de viaje, playas y reservas</p>
+        </header>
+
+        <main id="content">
+            <!-- INICIO -->
+            <section id="inicio" class="section">
+                <div class="card">
+                    <div class="flex-between">
+                        <h2><i class="fa-solid fa-wallet text-primary"></i> Presupuesto</h2>
+                        <button id="btn-reset-presupuesto" class="btn-icon text-muted" title="Reiniciar Presupuesto"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                    <div class="budget-item total">
+                        <span>Saldo Restante</span>
+                        <strong id="saldo-total">1100€</strong>
+                    </div>
+                    
+                    <form id="form-gasto" class="add-form">
+                        <input type="text" id="desc-gasto" placeholder="Gasto (ej. Cena)" required>
+                        <input type="number" id="monto-gasto" placeholder="€" step="0.01" required class="input-money">
+                        <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                    </form>
+                    
+                    <ul class="clean-list" id="lista-gastos">
+                        <!-- Gastos inyectados por JS -->
+                    </ul>
+                </div>
+                
+                <div class="card important-card">
+                    <h2><i class="fa-solid fa-triangle-exclamation"></i> Importante Llevar</h2>
+                    <ul class="check-list" id="lista-importante">
+                        <!-- Items inyectados por JS -->
+                    </ul>
+                    <form id="form-importante" class="add-form mt-10">
+                        <input type="text" id="nuevo-importante" placeholder="Añadir ítem..." required>
+                        <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fa-solid fa-suitcase-rolling text-primary"></i> Equipaje</h2>
+                    <div class="baggage-grid">
+                        <div class="baggage-col">
+                            <h3>Dani</h3>
+                            <ul class="check-list small" id="lista-dani">
+                                <!-- Items inyectados por JS -->
+                            </ul>
+                            <form id="form-dani" class="add-form mt-10">
+                                <input type="text" id="nuevo-dani" placeholder="Añadir..." required>
+                                <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                            </form>
+                        </div>
+                        <div class="baggage-col">
+                            <h3>Afri</h3>
+                            <ul class="check-list small" id="lista-afri">
+                                <!-- Items inyectados por JS -->
+                            </ul>
+                            <form id="form-afri" class="add-form mt-10">
+                                <input type="text" id="nuevo-afri" placeholder="Añadir..." required>
+                                <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DIAS -->
+            <section id="dias" class="section active">
+                <div class="card day-card">
+                    <h2>Sábado 4 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>09:00</strong> Salida</li>
+                        <li><strong>13:30</strong> Llegada aprox (apartamento, dejar cosas, ir al Mercadona)</li>
+                        <li><strong>Comida</strong> Apartamento: Empanada de carne</li>
+                        <li><strong>Tarde</strong> Playa Calahonda / El Salón (en Nerja)</li>
+                        <li><strong>Cena</strong> Restaurante Dolores El Chispa <a href="tel:952523697"><i class="fa-solid fa-phone"></i></a></li>
+                    </ul>
+                </div>
+                
+                <div class="card day-card">
+                    <h2>Domingo 5 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Comida</strong> El Pulguilla <a href="tel:952521384"><i class="fa-solid fa-phone"></i></a></li>
+                        <li><strong>Playa</strong> El Chorrillo / Carabeo / Carabeillo (en Nerja)</li>
+                        <li><strong>Cena</strong> Apartamento: Tortilla francesa con queso (3) y ?</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Lunes 6 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Cala</strong> Del Cañuelo</li>
+                        <li><strong>Comida (Nevera)</strong> Salmorejo con huevo cocido (2) y jamón picado + saladitos</li>
+                        <li><strong>Cena</strong> Apartamento: Pizza tortilla (guanciale, queso, barbacoa)</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Martes 7 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Cala</strong> Torre del Pino</li>
+                        <li><strong>Comida (Nevera)</strong> Ensalada de pasta, picoteo (fuet, patatas fritas, aceitunas), bocadillo para merienda, cervezas, fanta, agua</li>
+                        <li><strong>Tarde</strong> Vuelta al apartamento</li>
+                        <li><strong>Cena</strong> Apartamento: Tortita con carne picada y loncha de queso</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Miércoles 8 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Actividad</strong> Kayak Maro: sale desde playa de Burriana hacia cascada de Maro. Ver también piedra de Tarzán.</li>
+                        <li><strong>Comida</strong> Bar Redondo <a href="tel:658399538"><i class="fa-solid fa-phone"></i></a></li>
+                        <li><strong>Menú</strong> Hamburguesa (carne, pan, queso, bacon/guanchale, salsa barbacoa, cebolla)</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Jueves 9 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Playa</strong> De las Alberquillas</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Viernes 10 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Playa</strong> Del Molino de papel</li>
+                        <li><strong>Cena</strong> La Marina Marisquería</li>
+                        <li><strong>Noche</strong> Tomar copa</li>
+                    </ul>
+                </div>
+                
+                <div class="card day-card">
+                    <h2>Sábado 11 Julio</h2>
+                    <p class="text-muted">Fin del viaje, preparación de vuelta.</p>
+                </div>
+            </section>
+
+            <!-- MAPA / PLAYAS -->
+            <section id="mapa" class="section">
+                <div class="card">
+                    <h2><i class="fa-solid fa-umbrella-beach text-primary"></i> Guía de Playas</h2>
+                    
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Cala del Cañuelo</h3>
+                            <span class="badge badge-blue">Snorkel</span>
+                        </div>
+                        <a href="https://maps.app.goo.gl/KrE9gUCkHRwgPijf9" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Nudista de Cantarriján</h3>
+                            <span class="badge badge-gray">Piedras</span>
+                        </div>
+                        <p>Agua muy cristalina.</p>
+                        <a href="https://maps.app.goo.gl/qAixHJYR99usCwCE7" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Playa de Maro</h3>
+                            <span class="badge badge-blue">Snorkel</span>
+                        </div>
+                        <p>Agua cristalina. Se puede alquilar snorkel.</p>
+                        <div class="link-group">
+                            <a href="https://maps.app.goo.gl/SRrZa3u53FbRDanz7" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Playa</a>
+                            <a href="https://maps.app.goo.gl/L85jAYoWfrMQ2Xms7" class="btn-link" target="_blank"><i class="fa-solid fa-water"></i> Cascada</a>
+                        </div>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Playa de la Caleta</h3>
+                            <span class="badge badge-red">Sin servicios</span>
+                        </div>
+                        <p>Cerca. Agua más o menos cristalina. <strong>No tiene baños ni chiringuitos.</strong></p>
+                        <a href="https://maps.app.goo.gl/LwWYS9JaGowKbyBz5" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Cala Torre del Pino</h3>
+                            <span class="badge badge-green">Recomendada</span>
+                        </div>
+                        <p>Agua cristalina, muchas piedras. <strong>MUY RECOMENDADA.</strong></p>
+                        <a href="https://maps.app.goo.gl/ww92Lv8uVqJMuYyg6" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Las Alberquillas</h3>
+                            <span class="badge badge-blue">Cristalina</span>
+                        </div>
+                        <a href="https://maps.app.goo.gl/jUoDvZorY1Xdqk88A" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Molino de papel</h3>
+                            <span class="badge badge-blue">Snorkel</span>
+                        </div>
+                        <p>Todo piedras, llevar silla.</p>
+                        <a href="https://maps.app.goo.gl/wWRCmrHgpNeMwpqz7" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item no-border">
+                        <div class="flex-between align-start">
+                            <h3>Cala Barranco de Maro</h3>
+                            <span class="badge badge-red">NO IR</span>
+                        </div>
+                        <p>Malas reseñas, viven hippies y hay mucha basura.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOCALES -->
+            <section id="locales" class="section">
+                <div class="card restaurant-card">
+                    <div class="flex-between">
+                        <h2>Dolores El Chispa</h2>
+                        <a href="tel:952523697" class="phone-link"><i class="fa-solid fa-phone"></i></a>
+                    </div>
+                    <ul class="menu-list">
+                        <li><span>Coquinas</span> <span>13€</span></li>
+                        <li><span>Ración calamares</span> <span>9,90€</span></li>
+                        <li><span>Media de rejos</span> <span>6,20€</span></li>
+                        <li><span>Media puntillitas</span> <span>9,20€</span></li>
+                        <li><span>Media tortilla camarones (3)</span> <span>4,80€</span></li>
+                        <li><span>Media de cazón</span> <span>6€</span></li>
+                        <li><span>Caña / Tanque</span> <span>-</span></li>
+                    </ul>
+                    <div class="total-price">Total aprox: 50€</div>
+                </div>
+
+                <div class="card restaurant-card">
+                    <h2>Restaurante La Puntilla</h2>
+                    <ul class="menu-list">
+                        <li><span>Coquinas</span> <span>16€</span></li>
+                        <li><span>Ración calamares</span> <span>10,50€</span></li>
+                        <li><span>Media de rejos</span> <span>7,50€</span></li>
+                        <li><span>Media puntillitas</span> <span>10,60€</span></li>
+                        <li><span>Media tortilla camarones</span> <span>6€</span></li>
+                        <li><span>Caña 2,5 / Tanque 3,9</span> <span>-</span></li>
+                    </ul>
+                </div>
+
+                <div class="card restaurant-card">
+                    <div class="flex-between">
+                        <h2>El Pulguilla</h2>
+                        <a href="tel:952521384" class="phone-link"><i class="fa-solid fa-phone"></i></a>
+                    </div>
+                    <ul class="menu-list">
+                        <li><span>Gambas al pil pil</span> <span>10,90€</span></li>
+                        <li><span>Media de bravas</span> <span>5€</span></li>
+                        <li><span>Almejas</span> <span>7,70€</span></li>
+                        <li><span>Calamar a la plancha</span> <span>23€</span></li>
+                        <li><span>Cerveza</span> <span>5€</span></li>
+                    </ul>
+                    <div class="total-price">Total aprox: 60€</div>
+                </div>
+                
+                <div class="card">
+                    <h2>Otros Sitios</h2>
+                    <ul class="clean-list">
+                        <li><strong>Bar Redondo:</strong> <a href="tel:658399538" style="color:var(--primary)">658 39 95 38</a></li>
+                        <li><strong>La Marina Marisquería</strong> (Cena)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- AYUDA -->
+            <section id="ayuda" class="section">
+                <div class="card">
+                    <h2><i class="fa-solid fa-moon text-primary"></i> Planes de Noche</h2>
+                    <ul class="action-list">
+                        <li>
+                            <i class="fa-solid fa-ice-cream"></i> 
+                            <div>Paseo Balcón de Europa + Heladería Valenciano</div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-ship"></i> 
+                            <div>Barco de Chanquete</div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-dungeon"></i> 
+                            <div>
+                                Cueva de Nerja 
+                                <br>
+                                <a href="https://entradas.cuevadenerja.es/es/152-web-individual/1821-cueva-gratuita" target="_blank" class="btn-link inline-link" style="margin-top: 5px; display:inline-block;">Ver entrada gratuita</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fa-solid fa-camera text-primary"></i> Webcams en Directo</h2>
+                    <div class="webcam-grid">
+                        <a href="https://meteo365.es/livecams/nerja-balcon-europa.php" target="_blank" class="webcam-btn">
+                            <i class="fa-solid fa-video"></i> Balcón de Europa
+                        </a>
+                        <a href="https://meteo365.es/livecams/nerja-playa.php" target="_blank" class="webcam-btn">
+                            <i class="fa-solid fa-video"></i> Playa del Salón
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- BOTTOM NAVIGATION (Basado en la captura) -->
+        <nav class="bottom-nav">
+            <div class="nav-item" data-target="inicio">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio</span>
+            </div>
+            <div class="nav-item active" data-target="dias">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Días</span>
+            </div>
+            <div class="nav-item" data-target="mapa">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Mapa</span>
+            </div>
+            <div class="nav-item" data-target="locales">
+                <i class="fa-regular fa-comment-dots"></i>
+                <span>Locales</span>
+            </div>
+            <div class="nav-item" data-target="ayuda">
+                <i class="fa-solid fa-life-ring"></i>
+                <span>Ayuda</span>
+            </div>
+        </nav>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
