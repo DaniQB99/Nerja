@@ -2,7 +2,7 @@
     --bg-main: #f4f7fb;
     --primary: #4378ff; /* Nice modern blue */
     --primary-light: #e6edff;
-    --text-dark: #1e293b;
+    --text-dark: #000000; /* Changed to pure black for clarity in light theme */
     --text-muted: #64748b;
     --card-bg: rgba(255, 255, 255, 0.85);
     
@@ -13,6 +13,29 @@
     --green-bg: #d1fae5;
     --gray: #64748b;
     --gray-bg: #f1f5f9;
+
+    --border-color: #f1f5f9;
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1;
+    --nav-bg: #ffffff;
+}
+
+body.dark-theme {
+    --bg-main: #0f172a;
+    --primary: #60a5fa;
+    --primary-light: #1e3a8a;
+    --text-dark: #f8fafc;
+    --text-muted: #94a3b8;
+    --card-bg: rgba(30, 41, 59, 0.85);
+    
+    --red-bg: #7f1d1d;
+    --green-bg: #064e3b;
+    --gray-bg: #334155;
+    
+    --border-color: #334155;
+    --input-bg: #1e293b;
+    --input-border: #475569;
+    --nav-bg: #1e293b;
 }
 
 * {
@@ -57,6 +80,87 @@ body {
 .header p {
     font-size: 14px;
     opacity: 0.9;
+}
+
+.header-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 60px;
+}
+
+.theme-switch-wrapper {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+}
+
+/* Custom Theme Switch */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 64px;
+    height: 32px;
+}
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1a4a6e;
+    transition: .4s;
+    border-radius: 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    border: 2px solid #285e8e;
+}
+.slider i {
+    font-size: 14px;
+    z-index: 3;
+    transition: 0.4s;
+}
+.slider .fa-sun {
+    color: #f8fafc;
+}
+.slider .fa-moon {
+    color: #60a5fa;
+}
+
+/* Thumb */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #0b2742;
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+/* Checked state (Dark Mode) */
+input:checked + .slider .fa-sun {
+    color: #60a5fa;
+}
+input:checked + .slider .fa-moon {
+    color: #f8fafc;
+}
+input:checked + .slider:before {
+    transform: translateX(32px);
 }
 
 /* Sections */
@@ -129,7 +233,7 @@ body {
 .check-list.small li { font-size: 14px; margin-bottom: 10px; }
 
 /* Budgets */
-.budget-item.total {
+.budget-item.total, .budget-item-initial {
     background: var(--primary-light);
     color: var(--primary);
     padding: 15px;
@@ -142,6 +246,38 @@ body {
 }
 .budget-item.total strong { font-size: 20px; font-weight: 700; }
 
+.budget-item-initial span {
+    font-weight: 500;
+}
+.budget-item-initial .input-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.budget-item-initial input {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 700;
+    text-align: right;
+    width: 90px;
+    outline: none;
+    font-family: inherit;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+.budget-item-initial input:focus {
+    background: rgba(255, 255, 255, 0.4);
+    border-color: rgba(67, 120, 255, 0.3);
+    border-radius: 6px;
+    padding: 0 4px;
+}
+.budget-item-initial .currency-symbol {
+    font-size: 20px;
+    font-weight: 700;
+}
+
 /* Forms & Inputs */
 .add-form {
     display: flex;
@@ -152,17 +288,22 @@ body {
     flex: 1;
     min-width: 0;
     padding: 10px 12px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--input-border);
     border-radius: 8px;
     font-size: 14px;
     font-family: inherit;
-    background-color: #ffffff;
+    background-color: var(--input-bg);
     color: var(--text-dark);
     outline: none;
     transition: border-color 0.2s;
 }
 .add-form input:focus {
     border-color: var(--primary);
+}
+#presupuesto-inicial-input {
+    color: var(--text-dark) !important;
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
 }
 .input-money {
     max-width: 80px;

@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Viaje a Nerja</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Styles -->
+    <style>:root {
+    --bg-main: #f4f7fb;
+    --primary: #4378ff; /* Nice modern blue */
+    --primary-light: #e6edff;
+    --text-dark: #000000; /* Changed to pure black for clarity in light theme */
+    --text-muted: #64748b;
+    --card-bg: rgba(255, 255, 255, 0.85);
+    
+    /* Status Colors */
+    --red: #ef4444;
+    --red-bg: #fee2e2;
+    --green: #10b981;
+    --green-bg: #d1fae5;
+    --gray: #64748b;
+    --gray-bg: #f1f5f9;
+
+    --border-color: #f1f5f9;
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1;
+    --nav-bg: #ffffff;
+}
+
+body.dark-theme {
+    --bg-main: #0f172a;
+    --primary: #60a5fa;
+    --primary-light: #1e3a8a;
+    --text-dark: #f8fafc;
+    --text-muted: #94a3b8;
+    --card-bg: rgba(30, 41, 59, 0.85);
+    
+    --red-bg: #7f1d1d;
+    --green-bg: #064e3b;
+    --gray-bg: #334155;
+    
+    --border-color: #334155;
+    --input-bg: #1e293b;
+    --input-border: #475569;
+    --nav-bg: #1e293b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-dark);
+    padding-bottom: 120px; /* Space for the bottom nav */
+    line-height: 1.5;
+}
+
+#app-container {
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #4378ff 0%, #2563eb 100%);
+    color: white;
+    padding: 40px 20px 30px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    box-shadow: 0 10px 25px rgba(67, 120, 255, 0.3);
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.header-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 60px;
+}
+
+.theme-switch-wrapper {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+}
+
+/* Custom Theme Switch */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 64px;
+    height: 32px;
+}
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1a4a6e;
+    transition: .4s;
+    border-radius: 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    border: 2px solid #285e8e;
+}
+.slider i {
+    font-size: 14px;
+    z-index: 3;
+    transition: 0.4s;
+}
+.slider .fa-sun {
+    color: #f8fafc;
+}
+.slider .fa-moon {
+    color: #60a5fa;
+}
+
+/* Thumb */
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 24px;
+    width: 24px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #0b2742;
+    transition: .4s;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+/* Checked state (Dark Mode) */
+input:checked + .slider .fa-sun {
+    color: #60a5fa;
+}
+input:checked + .slider .fa-moon {
+    color: #f8fafc;
+}
+input:checked + .slider:before {
+    transform: translateX(32px);
+}
+
+/* Sections */
+.section {
+    display: none;
+    padding: 0 20px;
+    animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.section.active {
+    display: block;
+}
+
+@keyframes fadeUp {
+    0% { opacity: 0; transform: translateY(15px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards (Glassmorphism) */
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.text-primary { color: var(--primary); }
+.text-muted { color: var(--text-muted); }
+
+/* Utilities */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.align-start { align-items: flex-start; }
+
+.clean-list { list-style: none; }
+.clean-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 15px;
+}
+.clean-list li:last-child { border-bottom: none; padding-bottom: 0; }
+
+.check-list { list-style: none; }
+.check-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+.check-list li:last-child { margin-bottom: 0; }
+.check-list i { color: var(--primary); font-size: 14px; }
+.check-list.small li { font-size: 14px; margin-bottom: 10px; }
+
+/* Budgets */
+.budget-item.total, .budget-item-initial {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+.budget-item.total strong { font-size: 20px; font-weight: 700; }
+
+.budget-item-initial span {
+    font-weight: 500;
+}
+.budget-item-initial .input-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.budget-item-initial input {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 700;
+    text-align: right;
+    width: 90px;
+    outline: none;
+    font-family: inherit;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+.budget-item-initial input:focus {
+    background: rgba(255, 255, 255, 0.4);
+    border-color: rgba(67, 120, 255, 0.3);
+    border-radius: 6px;
+    padding: 0 4px;
+}
+.budget-item-initial .currency-symbol {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* Forms & Inputs */
+.add-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+.add-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background-color: var(--input-bg);
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s;
+}
+.add-form input:focus {
+    border-color: var(--primary);
+}
+#presupuesto-inicial-input {
+    color: var(--text-dark) !important;
+    background-color: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+}
+.input-money {
+    max-width: 80px;
+}
+.btn-add {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s;
+}
+.btn-add:active {
+    background: #2563eb;
+}
+.mt-10 { margin-top: 10px; }
+
+/* Icon Buttons (Delete/Reset) */
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px;
+    color: var(--text-muted);
+    transition: color 0.2s;
+}
+.btn-icon:active { color: var(--text-dark); }
+.btn-delete { color: var(--red); opacity: 0.6; }
+.btn-delete:active { opacity: 1; }
+
+/* Baggage */
+.baggage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+.baggage-col {
+    min-width: 0;
+}
+.baggage-col h3 {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Timeline (Dias) */
+.day-card h2 { color: var(--primary); }
+.timeline {
+    list-style: none;
+    position: relative;
+    padding-left: 20px;
+}
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: var(--primary-light);
+    border-radius: 2px;
+}
+.timeline li {
+    position: relative;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+.timeline li:last-child { margin-bottom: 0; }
+.timeline li::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+.timeline strong {
+    color: var(--text-dark);
+    display: inline-block;
+    margin-right: 6px;
+    font-weight: 600;
+}
+
+/* Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.badge-blue { background: var(--primary-light); color: var(--primary); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-gray { background: var(--gray-bg); color: var(--gray); }
+
+/* Playas */
+.beach-item {
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.beach-item.no-border { border-bottom: none; padding-bottom: 0; }
+.beach-item h3 { font-size: 16px; margin-bottom: 6px; }
+.beach-item p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+
+/* Links/Buttons */
+.btn-link {
+    display: inline-block;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    background: var(--primary-light);
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.btn-link:active { background: #d3e0ff; }
+.link-group { display: flex; gap: 10px; }
+
+/* Restaurants */
+.phone-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 50%;
+    text-decoration: none;
+}
+.menu-list {
+    list-style: none;
+    margin-top: 15px;
+}
+.menu-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.menu-list li:last-child { border-bottom: none; }
+.total-price {
+    margin-top: 15px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary);
+}
+
+/* Ayuda / Planes */
+.action-list { list-style: none; }
+.action-list li {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-main);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.action-list li:last-child { margin-bottom: 0; }
+.action-list i { font-size: 18px; color: var(--primary); width: 24px; text-align: center; }
+
+.webcam-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+.webcam-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-main);
+    padding: 16px;
+    border-radius: 12px;
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+.webcam-btn:active { background: #e2e8f0; }
+.webcam-btn i { color: var(--primary); font-size: 18px; }
+
+/* ------------------------------------- */
+/* BOTTOM NAVIGATION (EXACTLY AS SCREENSHOT) */
+/* ------------------------------------- */
+.bottom-nav {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 100px; /* Fully rounded pill */
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    z-index: 1000;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8; /* Light gray for inactive icons */
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 100px;
+    flex: 1;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+    transition: all 0.3s ease;
+}
+
+.nav-item span {
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-item.active {
+    background: #4378ff; /* The vibrant blue from the screenshot */
+    color: #ffffff;
+    padding: 12px 0; /* Slightly larger padding for active pill */
+    transform: scale(1.05); /* Slight pop effect */
+    box-shadow: 0 4px 15px rgba(67, 120, 255, 0.4);
+}
+</style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Viaje a Nerja ☀️</h1>
+                    <p>Guía de viaje, playas y reservas</p>
+                </div>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-checkbox">
+                        <input type="checkbox" id="theme-checkbox">
+                        <div class="slider round">
+                            <i class="fa-solid fa-sun"></i>
+                            <i class="fa-solid fa-moon"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </header>
+
+        <main id="content">
+            <!-- INICIO -->
+            <section id="inicio" class="section">
+                <div class="card">
+                    <div class="flex-between">
+                        <h2><i class="fa-solid fa-wallet text-primary"></i> Presupuesto</h2>
+                        <button id="btn-reset-presupuesto" class="btn-icon text-muted" title="Reiniciar Presupuesto"><i class="fa-solid fa-rotate-right"></i></button>
+                    </div>
+                    <div class="budget-item-initial">
+                        <span>P. Inicial</span>
+                        <div class="input-container">
+                            <input type="number" id="presupuesto-inicial-input" value="1170" step="1">
+                            <span class="currency-symbol">€</span>
+                        </div>
+                    </div>
+                    <div class="budget-item total">
+                        <span>Saldo Restante</span>
+                        <strong id="saldo-total">1170€</strong>
+                    </div>
+                    
+                    <form id="form-gasto" class="add-form">
+                        <input type="text" id="desc-gasto" placeholder="Gasto (ej. Cena)" required>
+                        <input type="number" id="monto-gasto" placeholder="€" step="0.01" required class="input-money">
+                        <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                    </form>
+                    
+                    <ul class="clean-list" id="lista-gastos">
+                        <!-- Gastos inyectados por JS -->
+                    </ul>
+                </div>
+                
+                <div class="card important-card">
+                    <h2><i class="fa-solid fa-triangle-exclamation"></i> Importante Llevar</h2>
+                    <ul class="check-list" id="lista-importante">
+                        <!-- Items inyectados por JS -->
+                    </ul>
+                    <form id="form-importante" class="add-form mt-10">
+                        <input type="text" id="nuevo-importante" placeholder="Añadir ítem..." required>
+                        <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fa-solid fa-suitcase-rolling text-primary"></i> Equipaje</h2>
+                    <div class="baggage-grid">
+                        <div class="baggage-col">
+                            <h3>Dani</h3>
+                            <ul class="check-list small" id="lista-dani">
+                                <!-- Items inyectados por JS -->
+                            </ul>
+                            <form id="form-dani" class="add-form mt-10">
+                                <input type="text" id="nuevo-dani" placeholder="Añadir..." required>
+                                <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                            </form>
+                        </div>
+                        <div class="baggage-col">
+                            <h3>Afri</h3>
+                            <ul class="check-list small" id="lista-afri">
+                                <!-- Items inyectados por JS -->
+                            </ul>
+                            <form id="form-afri" class="add-form mt-10">
+                                <input type="text" id="nuevo-afri" placeholder="Añadir..." required>
+                                <button type="submit" class="btn-add"><i class="fa-solid fa-plus"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DIAS -->
+            <section id="dias" class="section active">
+                <div class="card day-card">
+                    <h2>Sábado 4 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>09:00</strong> Salida</li>
+                        <li><strong>13:30</strong> Llegada aprox (apartamento, dejar cosas, ir al Mercadona)</li>
+                        <li><strong>Comida</strong> Apartamento: Empanada de carne</li>
+                        <li><strong>Tarde</strong> Playa Calahonda / El Salón (en Nerja)</li>
+                        <li><strong>Cena</strong> Restaurante Dolores El Chispa <a href="tel:952523697"><i class="fa-solid fa-phone"></i></a></li>
+                    </ul>
+                </div>
+                
+                <div class="card day-card">
+                    <h2>Domingo 5 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Comida</strong> El Pulguilla <a href="tel:952521384"><i class="fa-solid fa-phone"></i></a></li>
+                        <li><strong>Playa</strong> El Chorrillo / Carabeo / Carabeillo (en Nerja)</li>
+                        <li><strong>Cena</strong> Apartamento: Tortilla francesa con queso (3) y ?</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Lunes 6 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Cala</strong> Del Cañuelo</li>
+                        <li><strong>Comida (Nevera)</strong> Salmorejo con huevo cocido (2) y jamón picado + saladitos</li>
+                        <li><strong>Cena</strong> Apartamento: Pizza tortilla (guanciale, queso, barbacoa)</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Martes 7 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Cala</strong> Torre del Pino</li>
+                        <li><strong>Comida (Nevera)</strong> Ensalada de pasta, picoteo (fuet, patatas fritas, aceitunas), bocadillo para merienda, cervezas, fanta, agua</li>
+                        <li><strong>Tarde</strong> Vuelta al apartamento</li>
+                        <li><strong>Cena</strong> Apartamento: Tortita con carne picada y loncha de queso</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Miércoles 8 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Actividad</strong> Kayak Maro: sale desde playa de Burriana hacia cascada de Maro. Ver también piedra de Tarzán.</li>
+                        <li><strong>Comida</strong> Bar Redondo <a href="tel:658399538"><i class="fa-solid fa-phone"></i></a></li>
+                        <li><strong>Menú</strong> Hamburguesa (carne, pan, queso, bacon/guanchale, salsa barbacoa, cebolla)</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Jueves 9 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Playa</strong> De las Alberquillas</li>
+                    </ul>
+                </div>
+
+                <div class="card day-card">
+                    <h2>Viernes 10 Julio</h2>
+                    <ul class="timeline">
+                        <li><strong>Playa</strong> Del Molino de papel</li>
+                        <li><strong>Cena</strong> La Marina Marisquería</li>
+                        <li><strong>Noche</strong> Tomar copa</li>
+                    </ul>
+                </div>
+                
+                <div class="card day-card">
+                    <h2>Sábado 11 Julio</h2>
+                    <p class="text-muted">Fin del viaje, preparación de vuelta.</p>
+                </div>
+            </section>
+
+            <!-- MAPA / PLAYAS -->
+            <section id="mapa" class="section">
+                <div class="card">
+                    <h2><i class="fa-solid fa-umbrella-beach text-primary"></i> Guía de Playas</h2>
+                    
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Cala del Cañuelo</h3>
+                            <span class="badge badge-blue">Snorkel</span>
+                        </div>
+                        <a href="https://maps.app.goo.gl/KrE9gUCkHRwgPijf9" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Nudista de Cantarriján</h3>
+                            <span class="badge badge-gray">Piedras</span>
+                        </div>
+                        <p>Agua muy cristalina.</p>
+                        <a href="https://maps.app.goo.gl/qAixHJYR99usCwCE7" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Playa de Maro</h3>
+                            <span class="badge badge-blue">Snorkel</span>
+                        </div>
+                        <p>Agua cristalina. Se puede alquilar snorkel.</p>
+                        <div class="link-group">
+                            <a href="https://maps.app.goo.gl/SRrZa3u53FbRDanz7" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Playa</a>
+                            <a href="https://maps.app.goo.gl/L85jAYoWfrMQ2Xms7" class="btn-link" target="_blank"><i class="fa-solid fa-water"></i> Cascada</a>
+                        </div>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Playa de la Caleta</h3>
+                            <span class="badge badge-red">Sin servicios</span>
+                        </div>
+                        <p>Cerca. Agua más o menos cristalina. <strong>No tiene baños ni chiringuitos.</strong></p>
+                        <a href="https://maps.app.goo.gl/LwWYS9JaGowKbyBz5" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Cala Torre del Pino</h3>
+                            <span class="badge badge-green">Recomendada</span>
+                        </div>
+                        <p>Agua cristalina, muchas piedras. <strong>MUY RECOMENDADA.</strong></p>
+                        <a href="https://maps.app.goo.gl/ww92Lv8uVqJMuYyg6" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Las Alberquillas</h3>
+                            <span class="badge badge-blue">Cristalina</span>
+                        </div>
+                        <a href="https://maps.app.goo.gl/jUoDvZorY1Xdqk88A" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item">
+                        <div class="flex-between align-start">
+                            <h3>Molino de papel</h3>
+                            <span class="badge badge-blue">Snorkel</span>
+                        </div>
+                        <p>Todo piedras, llevar silla.</p>
+                        <a href="https://maps.app.goo.gl/wWRCmrHgpNeMwpqz7" class="btn-link" target="_blank"><i class="fa-solid fa-location-dot"></i> Google Maps</a>
+                    </div>
+
+                    <div class="beach-item no-border">
+                        <div class="flex-between align-start">
+                            <h3>Cala Barranco de Maro</h3>
+                            <span class="badge badge-red">NO IR</span>
+                        </div>
+                        <p>Malas reseñas, viven hippies y hay mucha basura.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOCALES -->
+            <section id="locales" class="section">
+                <div class="card restaurant-card">
+                    <div class="flex-between">
+                        <h2>Dolores El Chispa</h2>
+                        <a href="tel:952523697" class="phone-link"><i class="fa-solid fa-phone"></i></a>
+                    </div>
+                    <ul class="menu-list">
+                        <li><span>Coquinas</span> <span>13€</span></li>
+                        <li><span>Ración calamares</span> <span>9,90€</span></li>
+                        <li><span>Media de rejos</span> <span>6,20€</span></li>
+                        <li><span>Media puntillitas</span> <span>9,20€</span></li>
+                        <li><span>Media tortilla camarones (3)</span> <span>4,80€</span></li>
+                        <li><span>Media de cazón</span> <span>6€</span></li>
+                        <li><span>Caña / Tanque</span> <span>-</span></li>
+                    </ul>
+                    <div class="total-price">Total aprox: 50€</div>
+                </div>
+
+                <div class="card restaurant-card">
+                    <h2>Restaurante La Puntilla</h2>
+                    <ul class="menu-list">
+                        <li><span>Coquinas</span> <span>16€</span></li>
+                        <li><span>Ración calamares</span> <span>10,50€</span></li>
+                        <li><span>Media de rejos</span> <span>7,50€</span></li>
+                        <li><span>Media puntillitas</span> <span>10,60€</span></li>
+                        <li><span>Media tortilla camarones</span> <span>6€</span></li>
+                        <li><span>Caña 2,5 / Tanque 3,9</span> <span>-</span></li>
+                    </ul>
+                </div>
+
+                <div class="card restaurant-card">
+                    <div class="flex-between">
+                        <h2>El Pulguilla</h2>
+                        <a href="tel:952521384" class="phone-link"><i class="fa-solid fa-phone"></i></a>
+                    </div>
+                    <ul class="menu-list">
+                        <li><span>Gambas al pil pil</span> <span>10,90€</span></li>
+                        <li><span>Media de bravas</span> <span>5€</span></li>
+                        <li><span>Almejas</span> <span>7,70€</span></li>
+                        <li><span>Calamar a la plancha</span> <span>23€</span></li>
+                        <li><span>Cerveza</span> <span>5€</span></li>
+                    </ul>
+                    <div class="total-price">Total aprox: 60€</div>
+                </div>
+                
+                <div class="card">
+                    <h2>Otros Sitios</h2>
+                    <ul class="clean-list">
+                        <li><strong>Bar Redondo:</strong> <a href="tel:658399538" style="color:var(--primary)">658 39 95 38</a></li>
+                        <li><strong>La Marina Marisquería</strong> (Cena)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- AYUDA -->
+            <section id="ayuda" class="section">
+                <div class="card">
+                    <h2><i class="fa-solid fa-moon text-primary"></i> Planes de Noche</h2>
+                    <ul class="action-list">
+                        <li>
+                            <i class="fa-solid fa-ice-cream"></i> 
+                            <div>Paseo Balcón de Europa + Heladería Valenciano</div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-ship"></i> 
+                            <div>Barco de Chanquete</div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-dungeon"></i> 
+                            <div>
+                                Cueva de Nerja 
+                                <br>
+                                <a href="https://entradas.cuevadenerja.es/es/152-web-individual/1821-cueva-gratuita" target="_blank" class="btn-link inline-link" style="margin-top: 5px; display:inline-block;">Ver entrada gratuita</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fa-solid fa-camera text-primary"></i> Webcams en Directo</h2>
+                    <div class="webcam-grid">
+                        <a href="https://meteo365.es/livecams/nerja-balcon-europa.php" target="_blank" class="webcam-btn">
+                            <i class="fa-solid fa-video"></i> Balcón de Europa
+                        </a>
+                        <a href="https://meteo365.es/livecams/nerja-playa.php" target="_blank" class="webcam-btn">
+                            <i class="fa-solid fa-video"></i> Playa del Salón
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- BOTTOM NAVIGATION (Basado en la captura) -->
+        <nav class="bottom-nav">
+            <div class="nav-item" data-target="inicio">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio</span>
+            </div>
+            <div class="nav-item active" data-target="dias">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Días</span>
+            </div>
+            <div class="nav-item" data-target="mapa">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Mapa</span>
+            </div>
+            <div class="nav-item" data-target="locales">
+                <i class="fa-regular fa-comment-dots"></i>
+                <span>Locales</span>
+            </div>
+            <div class="nav-item" data-target="ayuda">
+                <i class="fa-solid fa-life-ring"></i>
+                <span>Ayuda</span>
+            </div>
+        </nav>
+    </div>
+    
+    <script>window.INITIAL_DATA = {
+    "presupuesto": {
+        "inicial": 1170,
+        "gastos": [
+            { "id": 1, "desc": "Apartamento", "monto": 530.18 },
+            { "id": 2, "desc": "Gasoil (aprox)", "monto": 150 },
+            { "id": 3, "desc": "Restaurante (restante)", "monto": 220 }
+        ]
+    },
+    "importante": [
+        { "id": 1, "text": "Aceite, vinagre, sal" },
+        { "id": 2, "text": "Tapers chino" },
+        { "id": 3, "text": "Servilletas" },
+        { "id": 4, "text": "Bolsa de basura" }
+    ],
+    "dani": [
+        { "id": 1, "text": "Butaca" },
+        { "id": 2, "text": "Mesa playa" }
+    ],
+    "afri": [
+        { "id": 1, "text": "Palas" },
+        { "id": 2, "text": "Mochila nevera" },
+        { "id": 3, "text": "Nevera rígida" },
+        { "id": 4, "text": "Cartas" }
+    ]
+}
+;
+let INITIAL_STATE = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // Init theme
+    const savedTheme = localStorage.getItem('nerja_theme');
+    const themeCheckbox = document.getElementById('theme-checkbox');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        if (themeCheckbox) themeCheckbox.checked = true;
+    }
+
+    initNavigation();
+    await initState();
+    renderAll();
+    setupEventListeners();
+});
+
+// --- NAVIGATION ---
+function initNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.section');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+
+            sections.forEach(section => section.classList.remove('active'));
+            const targetId = item.getAttribute('data-target');
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    });
+}
+
+// --- STATE MANAGEMENT (LocalStorage) ---
+async function initState() {
+    if (localStorage.getItem('nerja_app_state')) {
+        return;
+    }
+
+    if (window.INITIAL_DATA) {
+        saveState(window.INITIAL_DATA);
+        return;
+    }
+
+    try {
+        const response = await fetch('data.json');
+        INITIAL_STATE = await response.json();
+        saveState(INITIAL_STATE);
+    } catch (error) {
+        console.error('Error cargando data.json:', error);
+        // Fallback mínimo
+        saveState({
+            presupuesto: {
+                inicial: 1170,
+                gastos: []
+            },
+            importante: [],
+            dani: [],
+            afri: []
+        });
+    }
+}
+
+function getState() {
+    return JSON.parse(localStorage.getItem('nerja_app_state'));
+}
+
+function saveState(state) {
+    localStorage.setItem('nerja_app_state', JSON.stringify(state));
+}
+
+// --- RENDER FUNCTIONS ---
+function renderAll() {
+    const state = getState();
+
+    // Sync initial budget input with current state value
+    const initialInput = document.getElementById('presupuesto-inicial-input');
+    if (initialInput && state.presupuesto) {
+        initialInput.value = state.presupuesto.inicial;
+    }
+
+    renderPresupuesto(state.presupuesto);
+    renderList('lista-importante', state.importante, 'importante', 'fa-check');
+    renderList('lista-dani', state.dani, 'dani', 'fa-check');
+    renderList('lista-afri', state.afri, 'afri', 'fa-check');
+}
+
+function renderPresupuesto(presupuesto) {
+    const ul = document.getElementById('lista-gastos');
+    const saldoEl = document.getElementById('saldo-total');
+
+    ul.innerHTML = '';
+    let totalGastos = 0;
+
+    presupuesto.gastos.forEach(gasto => {
+        totalGastos += gasto.monto;
+        const li = document.createElement('li');
+        li.className = 'flex-between';
+
+        // Format to handle decimals properly
+        const montoFormateado = parseFloat(gasto.monto).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+
+        li.innerHTML = `
+            <span>${gasto.desc}</span> 
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span>${montoFormateado}</span>
+                <button class="btn-icon btn-delete" onclick="eliminarGasto(${gasto.id})"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `;
+        ul.appendChild(li);
+    });
+
+    const restante = presupuesto.inicial - totalGastos;
+    saldoEl.textContent = restante.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+
+    // Cambiar color si está en negativo
+    if (restante < 0) {
+        saldoEl.style.color = 'var(--red)';
+    } else {
+        saldoEl.style.color = 'inherit';
+    }
+}
+
+function renderList(elementId, items, listName, iconClass) {
+    const ul = document.getElementById(elementId);
+    ul.innerHTML = '';
+
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.style.justifyContent = 'space-between';
+        li.innerHTML = `
+            <div style="display:flex; gap:12px; align-items:center;">
+                <i class="fa-solid ${iconClass}"></i> ${item.text}
+            </div>
+            <button class="btn-icon btn-delete" onclick="eliminarItem('${listName}', ${item.id})"><i class="fa-solid fa-xmark"></i></button>
+        `;
+        ul.appendChild(li);
+    });
+}
+
+// --- EVENT LISTENERS ---
+function setupEventListeners() {
+    const themeCheckbox = document.getElementById('theme-checkbox');
+    if (themeCheckbox) {
+        themeCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('nerja_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('nerja_theme', 'light');
+            }
+        });
+    }
+
+    // Escuchar cambios en el presupuesto inicial
+    const initialInput = document.getElementById('presupuesto-inicial-input');
+    if (initialInput) {
+        initialInput.addEventListener('input', (e) => {
+            const valor = parseFloat(e.target.value);
+            if (!isNaN(valor)) {
+                const state = getState();
+                state.presupuesto.inicial = valor;
+                saveState(state);
+                renderPresupuesto(state.presupuesto);
+            }
+        });
+    }
+
+    // Reset State
+    document.getElementById('btn-reset-presupuesto').addEventListener('click', async () => {
+        if (confirm('¿Seguro que quieres reiniciar todo al estado inicial? Se borrarán tus cambios.')) {
+            let freshData = null;
+            if (window.INITIAL_DATA) {
+                freshData = window.INITIAL_DATA;
+            } else {
+                try {
+                    const response = await fetch('data.json');
+                    freshData = await response.json();
+                } catch (error) {
+                    console.error('Error al obtener los datos para reiniciar:', error);
+                }
+            }
+
+            if (freshData) {
+                saveState(freshData);
+                renderAll();
+            } else if (INITIAL_STATE) {
+                saveState(INITIAL_STATE);
+                renderAll();
+            }
+        }
+    });
+
+    // Form Gasto
+    document.getElementById('form-gasto').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const desc = document.getElementById('desc-gasto').value;
+        const monto = parseFloat(document.getElementById('monto-gasto').value);
+
+        if (desc && !isNaN(monto)) {
+            const state = getState();
+            const newId = Date.now();
+            state.presupuesto.gastos.push({ id: newId, desc, monto });
+            saveState(state);
+            renderPresupuesto(state.presupuesto);
+            e.target.reset();
+        }
+    });
+
+    // Form Importante
+    setupListForm('form-importante', 'nuevo-importante', 'importante');
+    setupListForm('form-dani', 'nuevo-dani', 'dani');
+    setupListForm('form-afri', 'nuevo-afri', 'afri');
+}
+
+function setupListForm(formId, inputId, listName) {
+    document.getElementById(formId).addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = document.getElementById(inputId).value;
+        if (text) {
+            const state = getState();
+            state[listName].push({ id: Date.now(), text });
+            saveState(state);
+            renderList(`lista-${listName}`, state[listName], listName, 'fa-check');
+            e.target.reset();
+        }
+    });
+}
+
+// --- GLOBAL ACTIONS (Used in HTML onclick) ---
+window.eliminarGasto = function (id) {
+    const state = getState();
+    state.presupuesto.gastos = state.presupuesto.gastos.filter(g => g.id !== id);
+    saveState(state);
+    renderPresupuesto(state.presupuesto);
+};
+
+window.eliminarItem = function (listName, id) {
+    const state = getState();
+    state[listName] = state[listName].filter(item => item.id !== id);
+    saveState(state);
+    renderList(`lista-${listName}`, state[listName], listName, 'fa-check');
+};
+</script>
+</body>
+</html>

@@ -1,33 +1,16 @@
-const INITIAL_STATE = {
-    presupuesto: {
-        inicial: 1100,
-        gastos: [
-            { id: 1, desc: "Apartamento", monto: 530.18 },
-            { id: 2, desc: "Gasoil (aprox)", monto: 150 },
-            { id: 3, desc: "Restaurante (restante)", monto: 220 }
-        ]
-    },
-    importante: [
-        { id: 1, text: "Aceite, vinagre, sal" },
-        { id: 2, text: "Tapers chino" },
-        { id: 3, text: "Servilletas" },
-        { id: 4, text: "Bolsa de basura" }
-    ],
-    dani: [
-        { id: 1, text: "Butaca" },
-        { id: 2, text: "Mesa playa" }
-    ],
-    afri: [
-        { id: 1, text: "Palas" },
-        { id: 2, text: "Mochila nevera" },
-        { id: 3, text: "Nevera rígida" },
-        { id: 4, text: "Cartas" }
-    ]
-};
+let INITIAL_STATE = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Init theme
+    const savedTheme = localStorage.getItem('nerja_theme');
+    const themeCheckbox = document.getElementById('theme-checkbox');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        if (themeCheckbox) themeCheckbox.checked = true;
+    }
+
     initNavigation();
-    initState();
+    await initState();
     renderAll();
     setupEventListeners();
 });
@@ -54,9 +37,32 @@ function initNavigation() {
 }
 
 // --- STATE MANAGEMENT (LocalStorage) ---
-function initState() {
-    if (!localStorage.getItem('nerja_app_state')) {
+async function initState() {
+    if (localStorage.getItem('nerja_app_state')) {
+        return;
+    }
+
+    if (window.INITIAL_DATA) {
+        saveState(window.INITIAL_DATA);
+        return;
+    }
+
+    try {
+        const response = await fetch('data.json');
+        INITIAL_STATE = await response.json();
         saveState(INITIAL_STATE);
+    } catch (error) {
+        console.error('Error cargando data.json:', error);
+        // Fallback mínimo
+        saveState({
+            presupuesto: {
+                inicial: 1170,
+                gastos: []
+            },
+            importante: [],
+            dani: [],
+            afri: []
+        });
     }
 }
 
@@ -71,6 +77,13 @@ function saveState(state) {
 // --- RENDER FUNCTIONS ---
 function renderAll() {
     const state = getState();
+
+    // Sync initial budget input with current state value
+    const initialInput = document.getElementById('presupuesto-inicial-input');
+    if (initialInput && state.presupuesto) {
+        initialInput.value = state.presupuesto.inicial;
+    }
+
     renderPresupuesto(state.presupuesto);
     renderList('lista-importante', state.importante, 'importante', 'fa-check');
     renderList('lista-dani', state.dani, 'dani', 'fa-check');
@@ -80,18 +93,18 @@ function renderAll() {
 function renderPresupuesto(presupuesto) {
     const ul = document.getElementById('lista-gastos');
     const saldoEl = document.getElementById('saldo-total');
-    
+
     ul.innerHTML = '';
     let totalGastos = 0;
-    
+
     presupuesto.gastos.forEach(gasto => {
         totalGastos += gasto.monto;
         const li = document.createElement('li');
         li.className = 'flex-between';
-        
+
         // Format to handle decimals properly
         const montoFormateado = parseFloat(gasto.monto).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-        
+
         li.innerHTML = `
             <span>${gasto.desc}</span> 
             <div style="display:flex; align-items:center; gap:10px;">
@@ -101,10 +114,10 @@ function renderPresupuesto(presupuesto) {
         `;
         ul.appendChild(li);
     });
-    
+
     const restante = presupuesto.inicial - totalGastos;
     saldoEl.textContent = restante.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-    
+
     // Cambiar color si está en negativo
     if (restante < 0) {
         saldoEl.style.color = 'var(--red)';
@@ -116,7 +129,7 @@ function renderPresupuesto(presupuesto) {
 function renderList(elementId, items, listName, iconClass) {
     const ul = document.getElementById(elementId);
     ul.innerHTML = '';
-    
+
     items.forEach(item => {
         const li = document.createElement('li');
         li.style.justifyContent = 'space-between';
@@ -132,11 +145,55 @@ function renderList(elementId, items, listName, iconClass) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
+    const themeCheckbox = document.getElementById('theme-checkbox');
+    if (themeCheckbox) {
+        themeCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('nerja_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('nerja_theme', 'light');
+            }
+        });
+    }
+
+    // Escuchar cambios en el presupuesto inicial
+    const initialInput = document.getElementById('presupuesto-inicial-input');
+    if (initialInput) {
+        initialInput.addEventListener('input', (e) => {
+            const valor = parseFloat(e.target.value);
+            if (!isNaN(valor)) {
+                const state = getState();
+                state.presupuesto.inicial = valor;
+                saveState(state);
+                renderPresupuesto(state.presupuesto);
+            }
+        });
+    }
+
     // Reset State
-    document.getElementById('btn-reset-presupuesto').addEventListener('click', () => {
+    document.getElementById('btn-reset-presupuesto').addEventListener('click', async () => {
         if (confirm('¿Seguro que quieres reiniciar todo al estado inicial? Se borrarán tus cambios.')) {
-            saveState(INITIAL_STATE);
-            renderAll();
+            let freshData = null;
+            if (window.INITIAL_DATA) {
+                freshData = window.INITIAL_DATA;
+            } else {
+                try {
+                    const response = await fetch('data.json');
+                    freshData = await response.json();
+                } catch (error) {
+                    console.error('Error al obtener los datos para reiniciar:', error);
+                }
+            }
+
+            if (freshData) {
+                saveState(freshData);
+                renderAll();
+            } else if (INITIAL_STATE) {
+                saveState(INITIAL_STATE);
+                renderAll();
+            }
         }
     });
 
@@ -145,7 +202,7 @@ function setupEventListeners() {
         e.preventDefault();
         const desc = document.getElementById('desc-gasto').value;
         const monto = parseFloat(document.getElementById('monto-gasto').value);
-        
+
         if (desc && !isNaN(monto)) {
             const state = getState();
             const newId = Date.now();
@@ -177,14 +234,14 @@ function setupListForm(formId, inputId, listName) {
 }
 
 // --- GLOBAL ACTIONS (Used in HTML onclick) ---
-window.eliminarGasto = function(id) {
+window.eliminarGasto = function (id) {
     const state = getState();
     state.presupuesto.gastos = state.presupuesto.gastos.filter(g => g.id !== id);
     saveState(state);
     renderPresupuesto(state.presupuesto);
 };
 
-window.eliminarItem = function(listName, id) {
+window.eliminarItem = function (listName, id) {
     const state = getState();
     state[listName] = state[listName].filter(item => item.id !== id);
     saveState(state);

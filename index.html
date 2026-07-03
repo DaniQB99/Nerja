@@ -17,8 +17,21 @@
     <div id="app-container">
         <!-- HEADER -->
         <header class="header">
-            <h1>Viaje a Nerja ☀️</h1>
-            <p>Guía de viaje, playas y reservas</p>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>Viaje a Nerja ☀️</h1>
+                    <p>Guía de viaje, playas y reservas</p>
+                </div>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="theme-checkbox">
+                        <input type="checkbox" id="theme-checkbox">
+                        <div class="slider round">
+                            <i class="fa-solid fa-sun"></i>
+                            <i class="fa-solid fa-moon"></i>
+                        </div>
+                    </label>
+                </div>
+            </div>
         </header>
 
         <main id="content">
@@ -29,9 +42,16 @@
                         <h2><i class="fa-solid fa-wallet text-primary"></i> Presupuesto</h2>
                         <button id="btn-reset-presupuesto" class="btn-icon text-muted" title="Reiniciar Presupuesto"><i class="fa-solid fa-rotate-right"></i></button>
                     </div>
+                    <div class="budget-item-initial">
+                        <span>P. Inicial</span>
+                        <div class="input-container">
+                            <input type="number" id="presupuesto-inicial-input" value="1170" step="1">
+                            <span class="currency-symbol">€</span>
+                        </div>
+                    </div>
                     <div class="budget-item total">
                         <span>Saldo Restante</span>
-                        <strong id="saldo-total">1100€</strong>
+                        <strong id="saldo-total">1170€</strong>
                     </div>
                     
                     <form id="form-gasto" class="add-form">
