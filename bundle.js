@@ -9,10 +9,6 @@ try {
     let html = fs.readFileSync(htmlPath, 'utf8');
     const css = fs.readFileSync(cssPath, 'utf8');
     let js = fs.readFileSync(jsPath, 'utf8');
-    const data = fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8');
-
-    // Inyectamos los datos del JSON directamente en el Javascript empaquetado
-    js = `window.INITIAL_DATA = ${data};\n` + js;
 
     // Reemplaza el link al CSS externo por la etiqueta style interna
     html = html.replace('<link rel="stylesheet" href="styles.css">', `<style>${css}</style>`);

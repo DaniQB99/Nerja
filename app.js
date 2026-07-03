@@ -2,13 +2,19 @@
 const SUPABASE_URL = 'https://moogukwmbndkmwftrqsn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vb2d1a3dtYm5ka213ZnRycXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODU4OTEsImV4cCI6MjA5ODY2MTg5MX0.2bxsYkoJiV0fT1lUKgCFt91wlkBZ6x7VOkCaTtWI9FA';
 
-let supabase = null;
+let supabaseClient = null;
 let isSyncing = false; // Prevent loops when receiving realtime updates
 
 // Initialize Supabase client
 function initSupabase() {
     if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false // Previene el error de history.replaceState en file://
+            }
+        });
     }
 }
 
@@ -71,9 +77,9 @@ function initNavigation() {
 // --- STATE MANAGEMENT (Supabase + LocalStorage cache) ---
 async function initState() {
     // Try loading from Supabase first (source of truth)
-    if (supabase) {
+    if (supabaseClient) {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('app_state')
                 .select('data')
                 .eq('id', 'nerja')
@@ -88,29 +94,18 @@ async function initState() {
         }
     }
 
-    // Fallback: localStorage or embedded data or fetch
+    // Fallback: localStorage
     if (localStorage.getItem('nerja_app_state')) {
         return;
     }
 
-    if (window.INITIAL_DATA) {
-        saveLocal(window.INITIAL_DATA);
-        return;
-    }
-
-    try {
-        const response = await fetch('data.json');
-        const jsonData = await response.json();
-        saveLocal(jsonData);
-    } catch (error) {
-        console.error('Error cargando data.json:', error);
-        saveLocal({
-            presupuesto: { inicial: 1170, gastos: [] },
-            importante: [],
-            dani: [],
-            afri: []
-        });
-    }
+    // Default empty state if no Supabase and no cache
+    saveLocal({
+        presupuesto: { inicial: 1170, gastos: [] },
+        importante: [],
+        dani: [],
+        afri: []
+    });
 }
 
 // Save to localStorage only (used for local cache)
@@ -122,9 +117,9 @@ function saveLocal(state) {
 async function saveState(state) {
     saveLocal(state);
 
-    if (supabase && !isSyncing) {
+    if (supabaseClient && !isSyncing) {
         try {
-            await supabase
+            await supabaseClient
                 .from('app_state')
                 .upsert({
                     id: 'nerja',
@@ -143,9 +138,9 @@ function getState() {
 
 // --- REALTIME SUBSCRIPTION ---
 function setupRealtime() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
 
-    supabase
+    supabaseClient
         .channel('app_state_changes')
         .on('postgres_changes',
             { event: '*', schema: 'public', table: 'app_state', filter: 'id=eq.nerja' },
@@ -262,25 +257,16 @@ function setupEventListeners() {
 
     // Reset State
     document.getElementById('btn-reset-presupuesto').addEventListener('click', async () => {
-        if (confirm('¿Seguro que quieres reiniciar todo al estado inicial? Se borrarán tus cambios.')) {
-            let freshData = null;
+        if (confirm('¿Seguro que quieres reiniciar todo al estado inicial? Se borrarán tus cambios en todos los dispositivos.')) {
+            const freshData = {
+                presupuesto: { inicial: 1170, gastos: [] },
+                importante: [],
+                dani: [],
+                afri: []
+            };
 
-            // Try fetching from data.json or embedded data
-            if (window.INITIAL_DATA) {
-                freshData = JSON.parse(JSON.stringify(window.INITIAL_DATA)); // deep clone
-            } else {
-                try {
-                    const response = await fetch('data.json');
-                    freshData = await response.json();
-                } catch (error) {
-                    console.error('Error al obtener los datos para reiniciar:', error);
-                }
-            }
-
-            if (freshData) {
-                await saveState(freshData);
-                renderAll();
-            }
+            await saveState(freshData);
+            renderAll();
         }
     });
 
