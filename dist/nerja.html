@@ -932,35 +932,80 @@ input:checked + .slider:before {
         </nav>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>window.INITIAL_DATA = {
     "presupuesto": {
         "inicial": 1170,
         "gastos": [
-            { "id": 1, "desc": "Apartamento", "monto": 530.18 },
-            { "id": 2, "desc": "Gasoil (aprox)", "monto": 150 },
-            { "id": 3, "desc": "Restaurante (restante)", "monto": 220 }
+            {
+                "id": 1,
+                "desc": "Apartamento",
+                "monto": 530.18
+            }
         ]
     },
     "importante": [
-        { "id": 1, "text": "Aceite, vinagre, sal" },
-        { "id": 2, "text": "Tapers chino" },
-        { "id": 3, "text": "Servilletas" },
-        { "id": 4, "text": "Bolsa de basura" }
+        {
+            "id": 1,
+            "text": "Aceite, vinagre, sal"
+        },
+        {
+            "id": 2,
+            "text": "Tapers chino"
+        },
+        {
+            "id": 3,
+            "text": "Servilletas"
+        },
+        {
+            "id": 4,
+            "text": "Bolsa de basura"
+        }
     ],
     "dani": [
-        { "id": 1, "text": "Butaca" },
-        { "id": 2, "text": "Mesa playa" }
+        {
+            "id": 1,
+            "text": "Butaca"
+        },
+        {
+            "id": 2,
+            "text": "Mesa playa"
+        }
     ],
     "afri": [
-        { "id": 1, "text": "Palas" },
-        { "id": 2, "text": "Mochila nevera" },
-        { "id": 3, "text": "Nevera rígida" },
-        { "id": 4, "text": "Cartas" }
+        {
+            "id": 1,
+            "text": "Palas"
+        },
+        {
+            "id": 2,
+            "text": "Mochila nevera"
+        },
+        {
+            "id": 3,
+            "text": "Nevera rígida"
+        },
+        {
+            "id": 4,
+            "text": "Cartas"
+        }
     ]
-}
-;
-let INITIAL_STATE = null;
+};
+// --- SUPABASE CONFIG ---
+const SUPABASE_URL = 'https://moogukwmbndkmwftrqsn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1vb2d1a3dtYm5ka213ZnRycXNuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwODU4OTEsImV4cCI6MjA5ODY2MTg5MX0.2bxsYkoJiV0fT1lUKgCFt91wlkBZ6x7VOkCaTtWI9FA';
 
+let supabase = null;
+let isSyncing = false; // Prevent loops when receiving realtime updates
+
+// Initialize Supabase client
+function initSupabase() {
+    if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+}
+
+// --- MAIN INIT ---
 document.addEventListener('DOMContentLoaded', async () => {
     // Init theme
     const savedTheme = localStorage.getItem('nerja_theme');
@@ -970,10 +1015,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (themeCheckbox) themeCheckbox.checked = true;
     }
 
+    // Navigation FIRST — must always work
     initNavigation();
-    await initState();
+
+    try {
+        initSupabase();
+    } catch (e) {
+        console.warn('Supabase init failed:', e);
+    }
+
+    try {
+        await initState();
+    } catch (e) {
+        console.warn('initState failed:', e);
+    }
+
     renderAll();
     setupEventListeners();
+
+    try {
+        setupRealtime();
+    } catch (e) {
+        console.warn('Realtime setup failed:', e);
+    }
 });
 
 // --- NAVIGATION ---
@@ -997,29 +1061,44 @@ function initNavigation() {
     });
 }
 
-// --- STATE MANAGEMENT (LocalStorage) ---
+// --- STATE MANAGEMENT (Supabase + LocalStorage cache) ---
 async function initState() {
+    // Try loading from Supabase first (source of truth)
+    if (supabase) {
+        try {
+            const { data, error } = await supabase
+                .from('app_state')
+                .select('data')
+                .eq('id', 'nerja')
+                .single();
+
+            if (data && !error) {
+                saveLocal(data.data);
+                return;
+            }
+        } catch (e) {
+            console.warn('Supabase no disponible, usando datos locales:', e);
+        }
+    }
+
+    // Fallback: localStorage or embedded data or fetch
     if (localStorage.getItem('nerja_app_state')) {
         return;
     }
 
     if (window.INITIAL_DATA) {
-        saveState(window.INITIAL_DATA);
+        saveLocal(window.INITIAL_DATA);
         return;
     }
 
     try {
         const response = await fetch('data.json');
-        INITIAL_STATE = await response.json();
-        saveState(INITIAL_STATE);
+        const jsonData = await response.json();
+        saveLocal(jsonData);
     } catch (error) {
         console.error('Error cargando data.json:', error);
-        // Fallback mínimo
-        saveState({
-            presupuesto: {
-                inicial: 1170,
-                gastos: []
-            },
+        saveLocal({
+            presupuesto: { inicial: 1170, gastos: [] },
             importante: [],
             dani: [],
             afri: []
@@ -1027,21 +1106,62 @@ async function initState() {
     }
 }
 
+// Save to localStorage only (used for local cache)
+function saveLocal(state) {
+    localStorage.setItem('nerja_app_state', JSON.stringify(state));
+}
+
+// Save to both Supabase and localStorage
+async function saveState(state) {
+    saveLocal(state);
+
+    if (supabase && !isSyncing) {
+        try {
+            await supabase
+                .from('app_state')
+                .upsert({
+                    id: 'nerja',
+                    data: state,
+                    updated_at: new Date().toISOString()
+                });
+        } catch (e) {
+            console.warn('Error guardando en Supabase:', e);
+        }
+    }
+}
+
 function getState() {
     return JSON.parse(localStorage.getItem('nerja_app_state'));
 }
 
-function saveState(state) {
-    localStorage.setItem('nerja_app_state', JSON.stringify(state));
+// --- REALTIME SUBSCRIPTION ---
+function setupRealtime() {
+    if (!supabase) return;
+
+    supabase
+        .channel('app_state_changes')
+        .on('postgres_changes',
+            { event: '*', schema: 'public', table: 'app_state', filter: 'id=eq.nerja' },
+            (payload) => {
+                if (payload.new && payload.new.data) {
+                    isSyncing = true;
+                    saveLocal(payload.new.data);
+                    renderAll();
+                    isSyncing = false;
+                }
+            }
+        )
+        .subscribe();
 }
 
 // --- RENDER FUNCTIONS ---
 function renderAll() {
     const state = getState();
+    if (!state) return;
 
     // Sync initial budget input with current state value
     const initialInput = document.getElementById('presupuesto-inicial-input');
-    if (initialInput && state.presupuesto) {
+    if (initialInput && state.presupuesto && document.activeElement !== initialInput) {
         initialInput.value = state.presupuesto.inicial;
     }
 
@@ -1137,8 +1257,10 @@ function setupEventListeners() {
     document.getElementById('btn-reset-presupuesto').addEventListener('click', async () => {
         if (confirm('¿Seguro que quieres reiniciar todo al estado inicial? Se borrarán tus cambios.')) {
             let freshData = null;
+
+            // Try fetching from data.json or embedded data
             if (window.INITIAL_DATA) {
-                freshData = window.INITIAL_DATA;
+                freshData = JSON.parse(JSON.stringify(window.INITIAL_DATA)); // deep clone
             } else {
                 try {
                     const response = await fetch('data.json');
@@ -1149,17 +1271,14 @@ function setupEventListeners() {
             }
 
             if (freshData) {
-                saveState(freshData);
-                renderAll();
-            } else if (INITIAL_STATE) {
-                saveState(INITIAL_STATE);
+                await saveState(freshData);
                 renderAll();
             }
         }
     });
 
     // Form Gasto
-    document.getElementById('form-gasto').addEventListener('submit', (e) => {
+    document.getElementById('form-gasto').addEventListener('submit', async (e) => {
         e.preventDefault();
         const desc = document.getElementById('desc-gasto').value;
         const monto = parseFloat(document.getElementById('monto-gasto').value);
@@ -1168,7 +1287,7 @@ function setupEventListeners() {
             const state = getState();
             const newId = Date.now();
             state.presupuesto.gastos.push({ id: newId, desc, monto });
-            saveState(state);
+            await saveState(state);
             renderPresupuesto(state.presupuesto);
             e.target.reset();
         }
@@ -1181,13 +1300,13 @@ function setupEventListeners() {
 }
 
 function setupListForm(formId, inputId, listName) {
-    document.getElementById(formId).addEventListener('submit', (e) => {
+    document.getElementById(formId).addEventListener('submit', async (e) => {
         e.preventDefault();
         const text = document.getElementById(inputId).value;
         if (text) {
             const state = getState();
             state[listName].push({ id: Date.now(), text });
-            saveState(state);
+            await saveState(state);
             renderList(`lista-${listName}`, state[listName], listName, 'fa-check');
             e.target.reset();
         }
@@ -1195,17 +1314,17 @@ function setupListForm(formId, inputId, listName) {
 }
 
 // --- GLOBAL ACTIONS (Used in HTML onclick) ---
-window.eliminarGasto = function (id) {
+window.eliminarGasto = async function (id) {
     const state = getState();
     state.presupuesto.gastos = state.presupuesto.gastos.filter(g => g.id !== id);
-    saveState(state);
+    await saveState(state);
     renderPresupuesto(state.presupuesto);
 };
 
-window.eliminarItem = function (listName, id) {
+window.eliminarItem = async function (listName, id) {
     const state = getState();
     state[listName] = state[listName].filter(item => item.id !== id);
-    saveState(state);
+    await saveState(state);
     renderList(`lista-${listName}`, state[listName], listName, 'fa-check');
 };
 </script>
